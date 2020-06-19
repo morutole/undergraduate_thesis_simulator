@@ -6,10 +6,14 @@ using namespace Eigen;
 
 int main() 
 {
-    cout << "Hello world" << endl;
-    Vector3d tmp;
-    tmp << 3, 4, 5;
-    cout << tmp.norm() << endl;
-    good_bye();
+    string csv_file_name = "observe.csv";
+
+    vector<string> header;
+    vector<vector<double>> true_value;
+    read_csv(csv_file_name, header, true_value);
+
+    cout << csv_file_name.size() << endl;
+    cout << true_value.at(0).size() << endl;
+
     return 0;
 }
