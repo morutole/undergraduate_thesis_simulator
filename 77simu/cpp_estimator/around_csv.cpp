@@ -1,10 +1,11 @@
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include "local_library.h"
 
 using namespace std;
 
-void read_csv(string file_name, vector<string>& header, vector<vector<double>>& true_vec)
+void read_csv(const string file_name, vector<string>& header, vector<vector<double>>& true_vec)
 {
     int i;
 
@@ -38,6 +39,20 @@ void read_csv(string file_name, vector<string>& header, vector<vector<double>>& 
                 true_vec.at(i).push_back(value);
             }
         }
+    }
+
+    return;
+}
+
+void to_csv(const string file_name, const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate)
+{
+    ofstream ofs(file_name);
+    int i,j;
+    int n = position_estimate.size();
+    for(i = 0;i < n;i += log_period){
+        for(j = 0;j < 3;++j) ofs << setprecision(12) << position_estimate.at(i)(j) << ',';
+        for(j = 0;j < 3;++j) ofs << setprecision(12) << velocity_estimate.at(i)(j) << ',';
+        ofs << endl;
     }
 
     return;
