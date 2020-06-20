@@ -33,7 +33,7 @@ void read_csv(string file_name, vector<string>& header, vector<vector<double>>& 
             if(!columns.empty()){
                 double value = stod(columns, nullptr);
                 true_vec.at(i).push_back(value);
-            }else{ //回靿用
+            }else{ //欠損用
                 double value = -1e10;
                 true_vec.at(i).push_back(value);
             }
