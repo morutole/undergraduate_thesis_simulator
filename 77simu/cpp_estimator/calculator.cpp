@@ -5,15 +5,16 @@ using namespace std;
 using namespace Eigen;
 //定数
 const double mu_const = 3.986004418e14; //GM_E m^3/s^2
-const double J2_const = 1.082636e-3; //無次元
+const double J2_const = 1.082636e-3; //無次元 重力J2項
 const double Earth_Radius = 6378136.6; //m
+
+const double diff_t = propagation_step_time; //1step当たりの秒数
 
 Vector3d position_differential(const Vector3d& velocity);
 Vector3d velocity_differential(const Vector3d& position, const Vector3d& velocity, const double& Cd);
 
 void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate)
 {
-    double diff_t = 1e-3; //1step当たりの時間をいくつにするか
     int iteration_number = round(1.0/diff_t); //1秒間あたりのstep数。微妙なずれを防ぐ。
 
     int i;
