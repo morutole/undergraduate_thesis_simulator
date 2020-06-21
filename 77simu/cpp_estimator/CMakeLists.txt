@@ -4,10 +4,14 @@ project(cpp_estimator VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
+add_definitions("-O2")
 add_executable(
     cpp_estimator 
     main.cpp
-    read_csv.cpp
+    around_csv.cpp
+    value_io.cpp
+    calculator.cpp
+    progress.cpp
 )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
