@@ -9,13 +9,20 @@ using namespace std;
 using namespace Eigen;
 
 using Matrix7d = Matrix<double, 7, 7>;
+using Vector6d = Matrix<double, 6, 1>;
+using Vector7d = Matrix<double, 7, 1>;
+
+//ファイル名
+const string input_csv_name = "observe.csv";
+const string output_estimate_csv_name = "estimate.csv";
+const string output_error_csv_name = "error.csv";
 
 const double propagation_step_time = 1e-3; //1step当たりの時間をいくつにするか(ルンゲクッタ)
 const int log_period = 10; //何stepごとにログをとるか propagation_step_time * log_periodで何sごとにログが出るか決まる。
 const int GPS_period = 1; //何sごとにGPSから[r,v]に関する情報を渡すか。
 
-const double position_error = 0.5; //位置に乗る観測誤差[m]
-const double velocity_error = 5e-3; //速度に乗る観測誤差[m/s];
+const double position_error = 5; //位置に乗る観測誤差[m]
+const double velocity_error = 5e-1; //速度に乗る観測誤差[m/s];
 
 const double position_noise = 1.0; //位置に乗るノイズ[m]
 const double velocity_noise = 0.1; //速度に乗るノイズ[m/s]
@@ -29,8 +36,8 @@ extern random_device seed_gen;
 extern mt19937 mt;
 
 //関数 //around_csv
-void read_csv(const string file_name, vector<string>& header, vector<vector<double>>& true_vec);
-void to_csv(const string file_name, const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, const vector<double>& Cd_estimate);
+void read_csv(vector<string>& header, vector<vector<double>>& true_vec);
+void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, const vector<double>& Cd_estimate, const vector<Vector7d, aligned_allocator<Vector7d>>& estimate_error, const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true, const vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed);
 
 //value_io
 bool pick_true_value(const vector<string>& header, const vector<vector<double>>& true_value, vector<Vector3d, aligned_allocator<Vector3d>>& position_true, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true);
@@ -38,6 +45,9 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
 
 //calculator
 void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector);
-void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector, const Vector3d true_position, const Vector3d true_velocity);
+void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector, const Vector3d true_position, const Vector3d true_velocity, vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed, vector<Vector7d, aligned_allocator<Vector7d>>& estimate_error);
+
+//progress
+bool progress_percentage(const string name, const int i, const int n, const double percent);
 
 #endif

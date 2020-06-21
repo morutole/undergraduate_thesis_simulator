@@ -11,6 +11,7 @@ add_executable(
     around_csv.cpp
     value_io.cpp
     calculator.cpp
+    progress.cpp
 )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

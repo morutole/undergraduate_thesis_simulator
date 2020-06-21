@@ -59,7 +59,7 @@ void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimat
     }
 }
 
-void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector, const Vector3d true_position, const Vector3d true_velocity)
+void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector, const Vector3d true_position, const Vector3d true_velocity, vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed, vector<Vector7d, aligned_allocator<Vector7d>>& estimate_error)
 {
 	int i;
 
@@ -101,13 +101,13 @@ void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estim
 	
 	K = M*H.transpose()*tmp.inverse();
 	
-	Matrix<double, 6, 1> z_vector; //観測値
+	Vector6d z_vector; //観測値
 	z_vector << observed_position(0), observed_position(1), observed_position(2), observed_velocity(0), observed_velocity(1), observed_velocity(2);
 
-	Matrix<double, 7, 1> x_predict; //事前推定値
+	Vector7d x_predict; //事前推定値
 	x_predict << estimate_position(0), estimate_position(1), estimate_position(2), estimate_velocity(0), estimate_velocity(1), estimate_velocity(2), Cd;
 
-	Matrix<double, 7, 1> x_update = x_predict + K*(z_vector - H*x_predict); //事後推定値
+	Vector7d x_update = x_predict + K*(z_vector - H*x_predict); //事後推定値
 	M = (MatrixXd::Identity(7, 7) - K*H)*M;
 
 	Vector3d update_position;
@@ -121,6 +121,12 @@ void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estim
 	velocity_estimate.back() = update_velocity;
 	Cd_estimate.back() = Cd;
 	M_store_vector.back() = M;
+
+	//ログ回り
+	position_observed.push_back(observed_position);
+	velocity_observed.push_back(observed_velocity);
+	Vector7d x_error = K*(z_vector - H*x_predict);
+	estimate_error.push_back(x_error);
 	
 	return;
 }
