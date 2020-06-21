@@ -3,6 +3,8 @@
 using namespace std;
 using namespace Eigen;
 
+double Cd_error;
+
 bool pick_true_value(const vector<string>& header, const vector<vector<double>>& true_value, vector<Vector3d, aligned_allocator<Vector3d>>& position_true, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true)
 {
     int i,j;
@@ -45,7 +47,7 @@ bool pick_true_value(const vector<string>& header, const vector<vector<double>>&
     return true;
 }
 
-void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, Matrix7d& M, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector)
+void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector)
 {
     int i;
     //初期値決め　わざと誤差を結構入れておく。
@@ -64,9 +66,13 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     }
     velocity_estimate.push_back(velocity);
 
-    double initial_airdragforce = 1.3e-5;
-    double initial_Cd = 1.3e-5/velocity.squaredNorm();
+    double initial_airdragforce = initial_estimate_airdrag_force;
+    double initial_Cd = initial_airdragforce/velocity.squaredNorm();
+    Cd_error = initial_Cd/10.0;
+
     Cd_estimate.push_back(initial_Cd);
+
+    Matrix7d M = MatrixXd::Zero(7, 7);
 
     for(i = 0;i < 3;++i){
         M(i) = (10.0*position_error)*(10.0*position_error); //位置の誤差
@@ -74,7 +80,7 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     for(i = 4;i < 6;++i){
         M(i) = (10.0*velocity_error)*(10.0*velocity_error); //速度の誤差
     }
-    M(6) = (initial_Cd/10.0)*(initial_Cd/10.0);
+    M(6) = Cd_error*Cd_error; //抵抗係数の誤差
 
     M_store_vector.push_back(M);
 

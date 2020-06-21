@@ -24,20 +24,26 @@ int main()
     vector<Vector3d, aligned_allocator<Vector3d>> velocity_estimate;
     vector<double> Cd_estimate; //抵抗係数推定
 
-    //推定値共分散行列
-    Matrix7d M = MatrixXd::Zero(7, 7);
-    vector<Matrix7d, aligned_allocator<Matrix7d>> M_store_vector; //保存用
+    vector<Matrix7d, aligned_allocator<Matrix7d>> M_store_vector; //推定値共分散行列
 
-    initialize_estimate(position_true, velocity_true, position_estimate, velocity_estimate, Cd_estimate, M, M_store_vector);
+    initialize_estimate(position_true, velocity_true, position_estimate, velocity_estimate, Cd_estimate, M_store_vector);
 
     int i;
 
     for(i = 0;i < position_true.size()-1;++i){
-        Runge_kutta(position_estimate, velocity_estimate, Cd_estimate);
+        cout << "simulator " << i << endl; 
+        Runge_kutta(position_estimate, velocity_estimate, Cd_estimate, M_store_vector);
+
+        if((i+1)%GPS_period == 0){
+            Vector3d positon = position_true.at(i+1);
+            Vector3d velocity =  velocity_true.at(i+1);
+
+            Kalman_Filter(position_estimate, velocity_estimate, Cd_estimate, M_store_vector, positon, velocity);
+        }
     }
 
     string output_csv = "estimate.csv";
-    to_csv(output_csv, position_estimate, velocity_estimate);
+    to_csv(output_csv, position_estimate, velocity_estimate, Cd_estimate);
 
     return 0;
 }
