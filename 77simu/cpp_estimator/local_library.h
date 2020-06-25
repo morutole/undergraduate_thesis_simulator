@@ -16,13 +16,15 @@ using Vector7d = Matrix<double, 7, 1>;
 const string input_csv_name = "observe.csv";
 const string output_estimate_csv_name = "estimate.csv";
 const string output_error_csv_name = "error.csv";
+const string output_true_csv_name = "true.csv";
+const string output_observed_csv_name = "observed.csv";
 
 const double propagation_step_time = 1e-3; //1step当たりの時間をいくつにするか(ルンゲクッタ)
 const int log_period = 10; //何stepごとにログをとるか propagation_step_time * log_periodで何sごとにログが出るか決まる。
-const int GPS_period = 1; //何sごとにGPSから[r,v]に関する情報を渡すか。
+const int GPS_period = 30; //何sごとにGPSから[r,v]に関する情報を渡すか。
 
-const double position_error = 5; //位置に乗る観測誤差[m]
-const double velocity_error = 5e-1; //速度に乗る観測誤差[m/s];
+const double position_error = 0.5; //位置に乗る観測誤差[m]
+const double velocity_error = 5e-2; //速度に乗る観測誤差[m/s];
 
 const double position_noise = 1.0; //位置に乗るノイズ[m]
 const double velocity_noise = 0.1; //速度に乗るノイズ[m/s]
