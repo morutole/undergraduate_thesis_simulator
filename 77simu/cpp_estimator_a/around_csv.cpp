@@ -85,13 +85,14 @@ void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estima
     for(i = 0;i < n;++i){
         for(j = 0;j < 3;++j) ofs3 << setprecision(12) << position_true.at(i)(j) << ',';
         for(j = 0;j < 3;++j) ofs3 << setprecision(12) << velocity_true.at(i)(j) << ',';
+        ofs3 << endl;
 
         if(progress_percentage("csv_true", i, n, percent)) percent += 1.0;
     }
 
     percent = 0.0;
     ofstream ofs4(log_dir_path + "/" + output_observed_csv_name);
-    n = position_observed.size();
+    n = position_observed.size() + 1; //observeは1つ少ない
 
     for(i = 0;i < n;++i){
         if(i == 0){
@@ -102,6 +103,8 @@ void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estima
             for(j = 0;j < 3;++j) ofs4 << setprecision(12) << velocity_observed.at(i-1)(j) << ',';
         }
         ofs4 << endl;
+
+        if(progress_percentage("csv_observe", i, n, percent)) percent += 1.0;
     }
 
     make_initial_condition_txt(log_dir_path);
