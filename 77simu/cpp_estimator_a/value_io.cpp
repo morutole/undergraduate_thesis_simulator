@@ -47,7 +47,7 @@ bool pick_true_value(const vector<string>& header, const vector<vector<double>>&
     return true;
 }
 
-void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<double>& Cd_estimate, vector<Matrix7d, aligned_allocator<Matrix7d>>& M_store_vector)
+void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, vector<Matrix10d, aligned_allocator<Matrix10d>>& M_store_vector)
 {
     int i;
     //初期値決め　わざと誤差を結構入れておく。
@@ -66,13 +66,16 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     }
     velocity_estimate.push_back(velocity);
 
+    Vector3d acceleration = VectorXd::Zero(3); //加速度初期値は0(推定のしようがないので)
+    acceleration_estimate.push_back(acceleration);
+
     double initial_airdragforce = initial_estimate_airdrag_force;
     double initial_Cd = initial_airdragforce/velocity.squaredNorm();
     Cd_error = initial_Cd/10.0;
 
     Cd_estimate.push_back(initial_Cd);
 
-    Matrix7d M = MatrixXd::Zero(7, 7);
+    Matrix10d M = MatrixXd::Zero(10, 10);
 
     for(i = 0;i < 3;++i){
         M(i,i) = (10.0*position_error)*(10.0*position_error); //位置の誤差
@@ -80,7 +83,10 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     for(i = 3;i < 6;++i){
         M(i,i) = (10.0*velocity_error)*(10.0*velocity_error); //速度の誤差
     }
-    M(6,6) = Cd_error*Cd_error; //抵抗係数の誤差
+    for(i = 6;i < 9;++i){
+        M(i,i) = (10.0*acceleration_noise)*(10.0*acceleration_noise); //加速度の誤差
+    }
+    M(9) = Cd_error*Cd_error; //抵抗係数の誤差
 
     M_store_vector.push_back(M);
 
