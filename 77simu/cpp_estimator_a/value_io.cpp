@@ -75,12 +75,12 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
 
     Cd_estimate.push_back(initial_Cd);
 
-    Matrix10d M = MatrixXd::Zero(7, 7);
+    Matrix10d M = MatrixXd::Zero(10, 10);
 
     for(i = 0;i < 3;++i){
         M(i,i) = (10.0*position_error)*(10.0*position_error); //位置の誤差
     }
-    for(i = 4;i < 6;++i){
+    for(i = 3;i < 6;++i){
         M(i,i) = (10.0*velocity_error)*(10.0*velocity_error); //速度の誤差
     }
     for(i = 6;i < 9;++i){
