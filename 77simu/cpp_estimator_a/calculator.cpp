@@ -57,7 +57,8 @@ void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimat
 		Cd_estimate.push_back(Cd);
 
         M = update_M_matrix(M, position, velocity, accelration, Cd);
-		M_store_vector.push_back(M);
+		//M_store_vector.push_back(M); //bad_allocate?
+		M_store_vector.back() = M;
     }
 }
 
@@ -227,7 +228,7 @@ Matrix10d calculate_Q_matrix()
 	for(i = 6;i < 9;++i){
 		Q(i,i) = acceleration_noise*acceleration_noise;
 	}
-	Q(6,6) = Cd_noise*Cd_noise;
+	Q(9,9) = Cd_noise*Cd_noise;
 
 	return Q;
 }
