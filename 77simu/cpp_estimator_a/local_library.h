@@ -8,7 +8,7 @@
 using namespace std;
 using namespace Eigen;
 
-using Matrix10d = Matrix<double, 10, 7>;
+using Matrix10d = Matrix<double, 10, 10>;
 using Vector6d = Matrix<double, 6, 1>;
 using Vector10d = Matrix<double, 10, 1>;
 
@@ -21,14 +21,14 @@ const string output_observed_csv_name = "observed.csv";
 
 const double propagation_step_time = 1e-3; //1step当たりの時間をいくつにするか(ルンゲクッタ)
 const int log_period = 10; //何stepごとにログをとるか propagation_step_time * log_periodで何sごとにログが出るか決まる。
-const int GPS_period = 1; //何sごとにGPSから[r,v]に関する情報を渡すか。
+const int GPS_period = 10; //何sごとにGPSから[r,v]に関する情報を渡すか。
 
 const double position_error = 0.5; //位置に乗る観測誤差[m]
 const double velocity_error = 5e-2; //速度に乗る観測誤差[m/s];
 
 const double position_noise = 1.0; //位置に乗るノイズ[m]
 const double velocity_noise = 0.1; //速度に乗るノイズ[m/s]
-const double acceleration_noise = 1e-3; //加速度に乗るノイズ[m/s^2] TBD
+const double acceleration_noise = 1e-2; //加速度に乗るノイズ[m/s^2] TBD
 const double Cd_noise = 1e-13; //[/m]
 
 const double initial_estimate_airdrag_force = 1.3e-5; //[N]
