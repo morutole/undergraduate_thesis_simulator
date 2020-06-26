@@ -71,7 +71,7 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
 
     double initial_airdragforce = initial_estimate_airdrag_force;
     double initial_Cd = initial_airdragforce/velocity.squaredNorm();
-    Cd_error = initial_Cd/10.0;
+    Cd_error = initial_Cd/10.0/10.0; //衛星重量10[kg]
 
     Cd_estimate.push_back(initial_Cd);
 
@@ -86,7 +86,7 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     for(i = 6;i < 9;++i){
         M(i,i) = (10.0*acceleration_noise)*(10.0*acceleration_noise); //加速度の誤差
     }
-    M(9,9) = Cd_error*Cd_error; //抵抗係数の誤差
+    M(9,9) = (10.0*Cd_error)*(10.0*Cd_error); //抵抗係数の誤差
 
     M_store_vector.push_back(M);
 
