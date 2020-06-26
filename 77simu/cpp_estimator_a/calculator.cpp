@@ -155,9 +155,9 @@ Vector3d velocity_differential(const Vector3d& position, const Vector3d& velocit
 
     Vector3d all_acceleration = position/r;
 
-    all_acceleration(0) *= ac_norm + tmp_J2_coefficient*(1.0 - 5.0*pow(z/r, 2.0));
-    all_acceleration(1) *= ac_norm + tmp_J2_coefficient*(1.0 - 5.0*pow(z/r, 2.0));
-    all_acceleration(2) *= ac_norm + tmp_J2_coefficient*(3.0 - 5.0*pow(z/r, 2.0));
+    all_acceleration(0) *= ac_norm - tmp_J2_coefficient*(1.0 - 5.0*pow(z/r, 2.0));
+    all_acceleration(1) *= ac_norm - tmp_J2_coefficient*(1.0 - 5.0*pow(z/r, 2.0));
+    all_acceleration(2) *= ac_norm - tmp_J2_coefficient*(3.0 - 5.0*pow(z/r, 2.0));
 
     all_acceleration -= Cd*v*velocity; //-Cd*V^2*(Vi/V) 大気抵抗
 
@@ -191,17 +191,17 @@ Matrix10d calculate_A_matrix(const Vector3d position, const Vector3d velocity, c
     Matrix10d A = MatrixXd::Zero(10,10);
     A(0,3) = 1.0; A(1,4) = 1.0; A(2,5) = 1.0;
 
-    A(3,0) = 3.0*mu_const*x*x/pow(r, 5.0) - mu_const/pow(r, 3.0) + J2_coefficient*(1.0/pow(r, 5.0) - 5.0*(x*x + z*z)/pow(r, 7.0) + 35.0*x*x*z*z/pow(r, 9.0));
-    A(3,1) = 3.0*mu_const*x*y/pow(r, 5.0) + J2_coefficient*( -5.0*x*y/pow(r, 7.0) + 35.0*x*y*z*z/pow(r, 9.0));
-    A(3,2) = 3.0*mu_const*x*z/pow(r, 5.0) + J2_coefficient*( -15.0*x*z/pow(r, 7.0) + 35.0*x*z*z*z/pow(r, 9.0));
+    A(3,0) = 3.0*mu_const*x*x/pow(r, 5.0) - mu_const/pow(r, 3.0) - J2_coefficient*(1.0/pow(r, 5.0) - 5.0*(x*x + z*z)/pow(r, 7.0) + 35.0*x*x*z*z/pow(r, 9.0));
+    A(3,1) = 3.0*mu_const*x*y/pow(r, 5.0) - J2_coefficient*( -5.0*x*y/pow(r, 7.0) + 35.0*x*y*z*z/pow(r, 9.0));
+    A(3,2) = 3.0*mu_const*x*z/pow(r, 5.0) - J2_coefficient*( -15.0*x*z/pow(r, 7.0) + 35.0*x*z*z*z/pow(r, 9.0));
 
-    A(4,0) = 3.0*mu_const*x*y/pow(r, 5.0) + J2_coefficient*( -5.0*x*y/pow(r, 7.0) + 35.0*x*y*z*z/pow(r, 9.0));
-    A(4,1) = 3.0*mu_const*y*y/pow(r, 5.0) - mu_const/pow(r, 3.0) + J2_coefficient*(1.0/pow(r, 5.0) - 5.0*(y*y + z*z)/pow(r, 7.0) + 35.0*y*y*z*z/pow(r, 9.0));
-    A(4,2) = 3.0*mu_const*y*z/pow(r, 5.0) + J2_coefficient*( -15.0*y*z/pow(r, 7.0) + 35.0*y*z*z*z/pow(r, 9.0));
+    A(4,0) = 3.0*mu_const*x*y/pow(r, 5.0) - J2_coefficient*( -5.0*x*y/pow(r, 7.0) + 35.0*x*y*z*z/pow(r, 9.0));
+    A(4,1) = 3.0*mu_const*y*y/pow(r, 5.0) - mu_const/pow(r, 3.0) - J2_coefficient*(1.0/pow(r, 5.0) - 5.0*(y*y + z*z)/pow(r, 7.0) + 35.0*y*y*z*z/pow(r, 9.0));
+    A(4,2) = 3.0*mu_const*y*z/pow(r, 5.0) - J2_coefficient*( -15.0*y*z/pow(r, 7.0) + 35.0*y*z*z*z/pow(r, 9.0));
 
-    A(5,0) = 3.0*mu_const*x*z/pow(r, 5.0) + J2_coefficient*( -15.0*x*z/pow(r, 7.0) + 35.0*x*z*z*z/pow(r, 9.0));
-    A(5,1) = 3.0*mu_const*y*z/pow(r, 5.0) + J2_coefficient*( -15.0*y*z/pow(r, 7.0) + 35.0*y*z*z*z/pow(r, 9.0));
-    A(5,2) = 3.0*mu_const*z*z/pow(r, 5.0) - mu_const/pow(r, 3.0) + J2_coefficient*(3.0/pow(r, 5.0) - 30.0*z*z/pow(r, 7.0) + 35.0*pow(z, 4.0)/pow(r, 9.0));
+    A(5,0) = 3.0*mu_const*x*z/pow(r, 5.0) - J2_coefficient*( -15.0*x*z/pow(r, 7.0) + 35.0*x*z*z*z/pow(r, 9.0));
+    A(5,1) = 3.0*mu_const*y*z/pow(r, 5.0) - J2_coefficient*( -15.0*y*z/pow(r, 7.0) + 35.0*y*z*z*z/pow(r, 9.0));
+    A(5,2) = 3.0*mu_const*z*z/pow(r, 5.0) - mu_const/pow(r, 3.0) - J2_coefficient*(3.0/pow(r, 5.0) - 30.0*z*z/pow(r, 7.0) + 35.0*pow(z, 4.0)/pow(r, 9.0));
 
     A(3,3) = -Cd*(vx*vx/v + v);    A(3,4) = -Cd*vx*vy/v;    A(3,5) = -Cd*vx*vz/v;
     A(4,3) = -Cd*vx*vy/v;    A(4,4) = -Cd*(vy*vy/v + v);    A(4,5) = -Cd*vy*vz/v;
