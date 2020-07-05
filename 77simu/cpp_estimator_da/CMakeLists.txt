@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(cpp_estimator VERSION 0.1.0)
+project(cpp_estimator_test VERSION 0.1.0)
 
 include(CTest)
 enable_testing()
 
 add_definitions("-O2")
 add_executable(
-    cpp_estimator 
+    cpp_estimator_test
     main.cpp
     around_csv.cpp
     value_io.cpp
