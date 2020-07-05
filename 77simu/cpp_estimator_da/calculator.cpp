@@ -9,7 +9,7 @@ const double mu_const = 3.986004418e14; //GM_E m^3/s^2
 const double J2_const = 1.082636e-3; //無次元 重力J2項
 const double Earth_Radius = 6378136.6; //m
 
-const double diff_t = propagation_step_time/10.0; //1step当たりの秒数 //test
+const double diff_t = propagation_step_time; //1step当たりの秒数
 
 Vector3d position_differential(const Vector3d& velocity);
 Vector3d velocity_differential(const Vector3d& position, const Vector3d& velocity, const Vector3d& acceleration, const double& Cd);
@@ -18,7 +18,7 @@ Matrix10d update_M_matrix(Matrix10d M, const Vector3d position, const Vector3d v
 Matrix10d calculate_A_matrix(const Vector3d position, const Vector3d velocity, const Vector3d acceleration, const double Cd);
 Matrix10d calculate_Q_matrix();
 
-void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, vector<Matrix10d, aligned_allocator<Matrix10d>>& M_store_vector)
+void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, Matrix10d &M, vector<Vector10d, aligned_allocator<Vector10d>>& M_store_vector)
 {
     int iteration_number = round(1.0/diff_t); //1秒間あたりのstep数。微妙なずれを防ぐ。
 
@@ -28,7 +28,6 @@ void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimat
 	Vector3d velocity = velocity_estimate.back();
 	Vector3d accelration = acceleration_estimate.back();
 	double Cd = Cd_estimate.back();
-	Matrix10d M = M_store_vector.back();
 
     for(i = 0;i < iteration_number;++i){
         Vector3d k0 = position_differential(velocity);
@@ -51,21 +50,18 @@ void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimat
 
         position += diff_t*(k0 + 2.0*k1 + 2.0*k2 + k3)/6.0;
         velocity += diff_t*(l0 + 2.0*l1 + 2.0*l2 + l3)/6.0;
-
-		if((i+1)%10 == 0){
-			position_estimate.push_back(position);
-			velocity_estimate.push_back(velocity);
-			acceleration_estimate.push_back(accelration);
-			Cd_estimate.push_back(Cd);
-		}
+        position_estimate.push_back(position);
+        velocity_estimate.push_back(velocity);
+		acceleration_estimate.push_back(accelration);
+		Cd_estimate.push_back(Cd);
 
         M = update_M_matrix(M, position, velocity, accelration, Cd);
-		//M_store_vector.push_back(M); //bad_allocate?
-		M_store_vector.back() = M;
+		Vector10d traceM = Matrix_trace_vector(M);
+		M_store_vector.push_back(traceM);
     }
 }
 
-void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, vector<Matrix10d, aligned_allocator<Matrix10d>>& M_store_vector, const Vector3d true_position, const Vector3d true_velocity, vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed, vector<Vector10d, aligned_allocator<Vector10d>>& estimate_error)
+void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, Matrix10d &M, vector<Vector10d, aligned_allocator<Vector10d>>& M_store_vector, const Vector3d true_position, const Vector3d true_velocity, vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed, vector<Vector10d, aligned_allocator<Vector10d>>& estimate_error)
 {
 	int i;
 
@@ -74,7 +70,6 @@ void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estim
 	Vector3d estimate_velocity = velocity_estimate.back();
 	Vector3d estimate_acceleration = acceleration_estimate.back();
 	double Cd = Cd_estimate.back();
-	Matrix10d M = M_store_vector.back();
 	
 	//観測値
 	Vector3d observed_position = true_position;
@@ -130,7 +125,8 @@ void Kalman_Filter(vector<Vector3d, aligned_allocator<Vector3d>>& position_estim
 	velocity_estimate.back() = update_velocity;
 	acceleration_estimate.back() = update_acceleration;
 	Cd_estimate.back() = Cd;
-	M_store_vector.back() = M;
+	Vector10d traceM = Matrix_trace_vector(M);
+	M_store_vector.back() = traceM;
 
 	//ログ回り
 	position_observed.push_back(observed_position);
