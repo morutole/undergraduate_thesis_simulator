@@ -49,7 +49,7 @@ void read_csv(vector<string>& header, vector<vector<double>>& true_vec)
     return;
 }
 
-void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, const vector<double>& Cd_estimate, const vector<Vector13d, aligned_allocator<Vector13d>>& estimate_error, const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true, const vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed)
+void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, const vector<double>& Cd_estimate, const vector<Vector10d, aligned_allocator<Vector10d>>& estimate_error, const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true, const vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed)
 {
     string log_dir_path = make_log_dir();
 
@@ -72,7 +72,7 @@ void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estima
     ofstream ofs2(log_dir_path + "/" + output_error_csv_name);
     n = estimate_error.size();
     for(i = 0;i < n;++i){
-        for(j = 0;j < 13;++j) ofs2 << setprecision(12) << estimate_error.at(i)(j) << ',';
+        for(j = 0;j < 10;++j) ofs2 << setprecision(12) << estimate_error.at(i)(j) << ',';
         ofs2 << endl;
 
         if(progress_percentage("csv_error", i, n, percent)) percent += 1.0;
