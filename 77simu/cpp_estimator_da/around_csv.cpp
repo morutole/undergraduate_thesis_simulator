@@ -49,7 +49,7 @@ void read_csv(vector<string>& header, vector<vector<double>>& true_vec)
     return;
 }
 
-void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, const vector<double>& Cd_estimate, const vector<Vector10d, aligned_allocator<Vector10d>>& estimate_error, const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true, const vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed)
+void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, const vector<double>& Cd_estimate, const vector<Vector10d, aligned_allocator<Vector10d>>& M_store_vector, const vector<Vector10d, aligned_allocator<Vector10d>>& estimate_error, const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true, const vector<Vector3d, aligned_allocator<Vector3d>>& position_observed, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_observed)
 {
     string log_dir_path = make_log_dir();
 
@@ -107,6 +107,17 @@ void to_csv(const vector<Vector3d, aligned_allocator<Vector3d>>& position_estima
         if(progress_percentage("csv_observe", i, n, percent)) percent += 1.0;
     }
 
+    percent = 0.0;
+    ofstream ofs5(log_dir_path + "/" + output_M_csv_name);
+    n = M_store_vector.size();
+
+    for(i = 0;i < n;++i){
+        for(j = 0;j < 10;++j) ofs5 << setprecision(12) << M_store_vector.at(i)(j) << ',';
+        ofs5 << endl;
+
+        if(progress_percentage("csv_M", i, n, percent)) percent += 1.0;
+    }
+
     make_initial_condition_txt(log_dir_path);
 
     return;
@@ -142,6 +153,7 @@ void make_initial_condition_txt(const string log_dir_path)
     ofs << "xyz 外乱[m]: " << position_noise << endl;
     ofs << "Vxyz 外乱[m/s]: " << velocity_noise << endl;
     ofs << "axyz 外乱[m/s^2]: " << acceleration_noise << endl;
+    ofs << "Cd 外乱[/m]: " << Cd_noise << endl;
     ofs << "初期推定大気抵抗[N]: " << initial_estimate_airdrag_force << endl;
 
     return;
