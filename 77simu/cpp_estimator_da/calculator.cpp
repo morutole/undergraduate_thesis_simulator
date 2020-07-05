@@ -9,7 +9,7 @@ const double mu_const = 3.986004418e14; //GM_E m^3/s^2
 const double J2_const = 1.082636e-3; //無次元 重力J2項
 const double Earth_Radius = 6378136.6; //m
 
-const double diff_t = propagation_step_time; //1step当たりの秒数
+const double diff_t = propagation_step_time/10.0; //1step当たりの秒数 //test
 
 Vector3d position_differential(const Vector3d& velocity);
 Vector3d velocity_differential(const Vector3d& position, const Vector3d& velocity, const Vector3d& acceleration, const double& Cd);
@@ -51,10 +51,13 @@ void Runge_kutta(vector<Vector3d, aligned_allocator<Vector3d>>& position_estimat
 
         position += diff_t*(k0 + 2.0*k1 + 2.0*k2 + k3)/6.0;
         velocity += diff_t*(l0 + 2.0*l1 + 2.0*l2 + l3)/6.0;
-        position_estimate.push_back(position);
-        velocity_estimate.push_back(velocity);
-		acceleration_estimate.push_back(accelration);
-		Cd_estimate.push_back(Cd);
+
+		if((i+1)%10 == 0){
+			position_estimate.push_back(position);
+			velocity_estimate.push_back(velocity);
+			acceleration_estimate.push_back(accelration);
+			Cd_estimate.push_back(Cd);
+		}
 
         M = update_M_matrix(M, position, velocity, accelration, Cd);
 		//M_store_vector.push_back(M); //bad_allocate?

@@ -50,9 +50,9 @@ bool pick_true_value(const vector<string>& header, const vector<vector<double>>&
 void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, vector<Matrix10d, aligned_allocator<Matrix10d>>& M_store_vector)
 {
     int i;
-    //初期値決め　誤差を入れておく
-    normal_distribution<> position_dist(0, position_error);
-    normal_distribution<> velocity_dist(0, velocity_error);
+    //初期値決め　わざと誤差を結構入れておく。
+    uniform_real_distribution<> position_dist(-2.0*position_error, 2.0*position_error);
+    uniform_real_distribution<> velocity_dist(-2.0*velocity_error, 2.0*velocity_error);
 
     Vector3d position = position_true.front();
     for(i = 0;i < 3;++i){
