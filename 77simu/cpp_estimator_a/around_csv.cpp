@@ -142,6 +142,7 @@ void make_initial_condition_txt(const string log_dir_path)
     ofs << "xyz 外乱[m]: " << position_noise << endl;
     ofs << "Vxyz 外乱[m/s]: " << velocity_noise << endl;
     ofs << "axyz 外乱[m/s^2]: " << acceleration_noise << endl;
+    ofs << "Cd 外乱[/m]: " << Cd_noise << endl;
     ofs << "初期推定大気抵抗[N]: " << initial_estimate_airdrag_force << endl;
 
     return;
