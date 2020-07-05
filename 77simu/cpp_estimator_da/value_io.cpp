@@ -47,7 +47,7 @@ bool pick_true_value(const vector<string>& header, const vector<vector<double>>&
     return true;
 }
 
-void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& daccel_estimate, vector<double>& Cd_estimate, vector<Matrix13d, aligned_allocator<Matrix13d>>& M_store_vector)
+void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, vector<Matrix10d, aligned_allocator<Matrix10d>>& M_store_vector)
 {
     int i;
     //初期値決め　わざと誤差を結構入れておく。
@@ -69,16 +69,13 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     Vector3d acceleration = VectorXd::Zero(3); //加速度初期値は0(推定のしようがないので)
     acceleration_estimate.push_back(acceleration);
 
-    Vector3d daccel = VectorXd::Zero(3);
-    daccel_estimate.push_back(daccel);
-
     double initial_airdragforce = initial_estimate_airdrag_force;
     double initial_Cd = initial_airdragforce/velocity.squaredNorm();
-    Cd_error = initial_Cd/10.0;
+    Cd_error = initial_Cd/10.0/10.0; //衛星重量10[kg]
 
     Cd_estimate.push_back(initial_Cd);
 
-    Matrix13d M = MatrixXd::Zero(13, 13);
+    Matrix10d M = MatrixXd::Zero(10, 10);
 
     for(i = 0;i < 3;++i){
         M(i,i) = (10.0*position_error)*(10.0*position_error); //位置の誤差
@@ -89,10 +86,7 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     for(i = 6;i < 9;++i){
         M(i,i) = (10.0*acceleration_noise)*(10.0*acceleration_noise); //加速度の誤差
     }
-    for(i = 9;i < 12;++i){
-        M(i,i) = (10.0*daccel_noise)*(10.0*daccel_noise); //加加速度の誤差
-    }
-    M(12,12) = Cd_error*Cd_error; //抵抗係数の誤差
+    M(9,9) = (10.0*Cd_error)*(10.0*Cd_error); //抵抗係数の誤差
 
     M_store_vector.push_back(M);
 

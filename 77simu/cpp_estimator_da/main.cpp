@@ -22,29 +22,28 @@ int main()
     vector<Vector3d, aligned_allocator<Vector3d>> position_estimate; 
     vector<Vector3d, aligned_allocator<Vector3d>> velocity_estimate;
     vector<Vector3d, aligned_allocator<Vector3d>> acceleration_estimate;
-    vector<Vector3d, aligned_allocator<Vector3d>> daccel_estimate;
     vector<double> Cd_estimate; //抵抗係数推定
 
-    vector<Matrix13d, aligned_allocator<Matrix13d>> M_store_vector; //推定値共分散行列
+    vector<Matrix10d, aligned_allocator<Matrix10d>> M_store_vector; //推定値共分散行列
 
-    initialize_estimate(position_true, velocity_true, position_estimate, velocity_estimate, acceleration_estimate, daccel_estimate, Cd_estimate, M_store_vector);
+    initialize_estimate(position_true, velocity_true, position_estimate, velocity_estimate, acceleration_estimate, Cd_estimate, M_store_vector);
 
     //観測された値(観測誤差あり)
     vector<Vector3d, aligned_allocator<Vector3d>> position_observed; 
     vector<Vector3d, aligned_allocator<Vector3d>> velocity_observed;
-    vector<Vector13d, aligned_allocator<Vector13d>> estimate_error; //修正値
+    vector<Vector10d, aligned_allocator<Vector10d>> estimate_error; //修正値
     
     int i;
     double percent = 0.0;
 
     for(i = 0;i < position_true.size()-1;++i){
-        Runge_kutta(position_estimate, velocity_estimate, acceleration_estimate, daccel_estimate, Cd_estimate, M_store_vector);
+        Runge_kutta(position_estimate, velocity_estimate, acceleration_estimate, Cd_estimate, M_store_vector);
 
         if((i+1)%GPS_period == 0){
             Vector3d positon = position_true.at(i+1);
             Vector3d velocity =  velocity_true.at(i+1);
             
-            Kalman_Filter(position_estimate, velocity_estimate, acceleration_estimate, daccel_estimate, Cd_estimate, M_store_vector, positon, velocity, position_observed, velocity_observed, estimate_error);
+            Kalman_Filter(position_estimate, velocity_estimate, acceleration_estimate, Cd_estimate, M_store_vector, positon, velocity, position_observed, velocity_observed, estimate_error);
         }
 
         if(progress_percentage("simulation", i, position_true.size()-1, percent)) percent += 1.0;
