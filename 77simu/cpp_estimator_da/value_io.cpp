@@ -47,7 +47,7 @@ bool pick_true_value(const vector<string>& header, const vector<vector<double>>&
     return true;
 }
 
-void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, vector<double>& Cd_estimate, Matrix10d &M, vector<Vector10d, aligned_allocator<Vector10d>>& M_store_vector)
+void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& position_true, const vector<Vector3d, aligned_allocator<Vector3d>>& velocity_true,  vector<Vector3d, aligned_allocator<Vector3d>>& position_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& velocity_estimate, vector<Vector3d, aligned_allocator<Vector3d>>& acceleration_estimate, Matrix9d &M, vector<Vector9d, aligned_allocator<Vector9d>>& M_store_vector)
 {
     int i;
     //初期値決め　誤差を入れておく
@@ -69,13 +69,7 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     Vector3d acceleration = VectorXd::Zero(3); //加速度初期値は0(推定のしようがないので)
     acceleration_estimate.push_back(acceleration);
 
-    double initial_airdragforce = initial_estimate_airdrag_force;
-    double initial_Cd = initial_airdragforce/velocity.squaredNorm();
-    Cd_error = initial_Cd/10.0/10.0; //衛星重量10[kg]
-
-    Cd_estimate.push_back(initial_Cd);
-
-    M = MatrixXd::Zero(10, 10);
+    M = MatrixXd::Zero(9, 9);
 
     for(i = 0;i < 3;++i){
         M(i,i) = (10.0*position_error)*(10.0*position_error); //位置の誤差
@@ -86,21 +80,20 @@ void initialize_estimate(const vector<Vector3d, aligned_allocator<Vector3d>>& po
     for(i = 6;i < 9;++i){
         M(i,i) = (10.0*acceleration_noise)*(10.0*acceleration_noise); //加速度の誤差
     }
-    M(9,9) = (10.0*Cd_error)*(10.0*Cd_error); //抵抗係数の誤差
 
-    Vector10d traceM = Matrix_trace_vector(M);
+    Vector9d traceM = Matrix_trace_vector(M);
     M_store_vector.push_back(traceM);
 
     return;
 }
 
 //対角行列専用
-Vector10d Matrix_trace_vector(Matrix10d A)
+Vector9d Matrix_trace_vector(Matrix9d A)
 {
     if(A.cols() != A.rows()) exit; //対角で無かったら即終了
     int n = A.cols();
     int i;
-    Vector10d res;
+    Vector9d res;
     for(i = 0;i < n;++i){
         res(i) = A(i,i);
     }
